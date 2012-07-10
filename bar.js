@@ -38,9 +38,10 @@ Line.prototype.count = function() {
 //---------------------------------------------------------------------------------------------------------
 
 // Patron
-function Patron(name,age)	{
+function Patron(name,age,guestlist)	{
 	this.name = name;
 	this.age = age;
+	this.guestlist = guestlist
 	this.wristband;
 	this.drunkLevel = 0;
 	this.wallet = 100;
@@ -131,6 +132,7 @@ Doorman.prototype.processPatron	= function(patron) {
 //---------------------------------------------------------------------------------------------------------
 
 // Bartender
+// doesn't really do anything yet
 function Bartender(queue)	{
 	this.queue = queue;
 };
@@ -138,28 +140,61 @@ function Bartender(queue)	{
 //---------------------------------------------------------------------------------------------------------
 
 // Bar
-function Bar(name,capacity)	{
+function Bar(name,capacity,doormen)	{
     this.name = name;
     this.capacity = capacity;
     this.entryQueue = new Line();
     this.serviceQueue = new Line();
     this.patronsQueue = new Line();
     this.tender = new Bartender(this.serviceQueue);
-    this.door1 = new Doorman(this);
+    this.doormen = doormen;
+    this.door1 = null;
+    this.door2 = null;
+};
+
+Bar.prototype.getDoorman = function()	{
+	switch(this.doormen)	{
+		case 1:
+			this.door1 = new Doorman(this);
+			this.door2 = null;
+			break;
+		case 2:
+			this.door1 = new Doorman(this);
+			this.door2 = new Doorman(this);
+			break;
+		default:
+			this.door1 = null;
+			this.door2 = null;
+	}
 };
 
 Bar.prototype.visitor = function(patron)    {
-    	var doorman = this.door1 || this.door2 || new Doorman(this);
-	doorman.processPatron(patron);
+    	if(this.door1 != null)	{
+    		if(this.door2 != null)	{
+    			if(patron.guestlist === true)	{
+    				this.door2.processPatron(patron);
+    			}
+    			else	{
+    				this.door1.processPatron(patron);
+    			}
+    		}
+    		else	{
+    			this.door1.processPatron(patron);
+    		}
+    	}
+    	else	{
+    		this.door1 = new Doorman(this);
+    		this.door1.processPatron(patron);
+   	}
 };
 
 
 //---------------------------------------------------------------------------------------------------------
 
-var myBar = new Bar("The Couch",10);
-var p1 = new Patron("Tyler",26);
+var myBar = new Bar("The Couch",10,2);
+var p1 = new Patron("Tyler",26,true);
 var p2 = new Patron("Jessica",24);
-var p3 = new Patron("Nathan",22);
+var p3 = new Patron("Nathan",22,true);
 var p4 = new Patron("Austin",19);
 var p5 = new Patron("Bella", 3);
 
