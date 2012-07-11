@@ -8,17 +8,13 @@ function Line()	{
 
 Line.prototype.join = function(patron) {
 	// add patron to the list.
-
-	// do some checks here, like is valid patron, patron not in queue already.
 	this.queue.push(patron);
 
 };
 
 
 Line.prototype.leave = function(patron) {
-	// remove patron from the list.
-
-	// do some checks here, like is valid patron, is patron in queue.
+	// remove patron from the list
 	
 	
 	// This is used to find the position of the patron in the array
@@ -39,9 +35,9 @@ Line.prototype.count = function() {
 
 // Patron
 function Patron(name,age,guestlist)	{
-	this.name = name;
-	this.age = age;
-	this.guestlist = guestlist
+        this.name = name;
+        this.age = age;
+        this.guestlist = guestlist;
 	this.wristband;
 	this.drunkLevel = 0;
 	this.wallet = 100;
@@ -56,7 +52,7 @@ function Doorman(bar) {
 	this.bar = bar;
 };
 
-// Checking the ID of a patron, would it be better to take the first patron in line?
+// Checking the ID of a patron
 Doorman.prototype.checkID = function(patron)	{
 	if(patron.age >= 19)	{
 		patron.wristband = true;
@@ -132,9 +128,48 @@ Doorman.prototype.processPatron	= function(patron) {
 //---------------------------------------------------------------------------------------------------------
 
 // Bartender
-// doesn't really do anything yet
 function Bartender(queue)	{
-	this.queue = queue;
+    this.queue = queue.queue;
+        
+    // Drink Menu
+    this.drinks = {
+        coke: {
+            alcLevel: 0,
+            price: 2,
+            name: "Coca Cola"
+        },
+    	beer: {
+	    alcLevel: 2,
+	    price: 5,
+	    name: "The Beer"
+	}
+    };
+};
+
+Bartender.prototype.drinks = function()    {
+
+};
+
+// Takes first person in line
+Bartender.prototype.serve = function()    {
+        var x = this.queue.shift();
+        this.checkDrunk(x);
+};
+
+// Check if too drunk
+Bartender.prototype.checkDrunk = function(patron)    {
+    if(patron.drunkLevel > 20)    {
+        console.log("You are too drunk, no alcohol for you!")
+    }
+    else    {
+        this.offerDrink(patron);
+    }
+};
+
+// Offer a drink
+Bartender.prototype.offerDrink = function(patron)    {
+        console.log(this.drinks.length);
+        console.log("What can I get for you, " + patron.name + "?");
 };
 
 //---------------------------------------------------------------------------------------------------------
@@ -152,45 +187,50 @@ function Bar(name,capacity,doormen)	{
     this.door2 = null;
 };
 
-Bar.prototype.getDoorman = function()	{
-	switch(this.doormen)	{
-		case 1:
-			this.door1 = new Doorman(this);
-			this.door2 = null;
-			break;
-		case 2:
-			this.door1 = new Doorman(this);
-			this.door2 = new Doorman(this);
-			break;
-		default:
-			this.door1 = null;
-			this.door2 = null;
-	}
+Bar.prototype.getDoorman = function()    {
+    switch(this.doormen)  {
+        case 1:
+            this.door1 = new Doorman(this);
+            this.door2 = null;
+            break;
+        case 2:
+            this.door1 = new Doorman(this);
+            this.door2 = new Doorman(this);
+            break;
+        default:
+            this.door1 = null;
+            this.door2 = null;
+    }
 };
 
+
 Bar.prototype.visitor = function(patron)    {
-    	if(this.door1 != null)	{
-    		if(this.door2 != null)	{
-    			if(patron.guestlist === true)	{
-    				this.door2.processPatron(patron);
-    			}
-    			else	{
-    				this.door1.processPatron(patron);
-    			}
-    		}
-    		else	{
-    			this.door1.processPatron(patron);
-    		}
-    	}
-    	else	{
-    		this.door1 = new Doorman(this);
-    		this.door1.processPatron(patron);
-   	}
+    if(this.door1 != null)    {
+        if(this.door2 != null)    {
+            if(patron.guestlist === true)    {
+                this.door2.processPatron(patron);
+            }
+            else    {
+                this.door1.processPatron(patron);
+            }
+        }
+        else    {
+            this.door1.processPatron(patron);
+        }
+    }
+    else    {
+        this.door1 = new Doorman(this);
+        this.door1.processPatron(patron);
+    }
+        
+    // this.door1 = (this.door1 === null ? new Doorman(this) : this.door1);
+    // this.door1.processPatron(patron);
 };
 
 
 //---------------------------------------------------------------------------------------------------------
 
+// Creating the bar and patrons
 var myBar = new Bar("The Couch",10,2);
 var p1 = new Patron("Tyler",26,true);
 var p2 = new Patron("Jessica",24);
@@ -198,9 +238,15 @@ var p3 = new Patron("Nathan",22,true);
 var p4 = new Patron("Austin",19);
 var p5 = new Patron("Bella", 3);
 
+// Adding the patrons to the bar
 myBar.visitor(p1);
 myBar.visitor(p2);
 myBar.visitor(p3);
 myBar.visitor(p4);
 myBar.visitor(p5);
+
+// Doing stuff in the bar
+myBar.getInLine(p1);
+myBar.serve();
+
 //---------------------------------------------------------------------------------------------------------
