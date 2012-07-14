@@ -132,22 +132,18 @@ function Bartender(queue)	{
     this.queue = queue.queue;
         
     // Drink Menu
-    this.drinks = {
-        coke: {
-            alcLevel: 0,
-            price: 2,
-            name: "Coca Cola"
+    this.drinks = [
+	{
+		name: "Coca Cola",
+         	alcLevel: 0,
+            	price: 2
         },
-    	beer: {
-	    alcLevel: 2,
-	    price: 5,
-	    name: "The Beer"
+    	{
+		name: "The Beer",
+		alcLevel: 2,
+		price: 5
 	}
-    };
-};
-
-Bartender.prototype.drinks = function()    {
-
+    ];
 };
 
 // Takes first person in line
@@ -168,7 +164,10 @@ Bartender.prototype.checkDrunk = function(patron)    {
 
 // Offer a drink
 Bartender.prototype.offerDrink = function(patron)    {
-        console.log(this.drinks.length);
+        console.log("Here is our drink menu:");
+        for(var i=0;i<this.drinks.length;i++)    {
+        console.log(this.drinks[i].name);
+        };
         console.log("What can I get for you, " + patron.name + "?");
 };
 
@@ -222,9 +221,12 @@ Bar.prototype.visitor = function(patron)    {
         this.door1 = new Doorman(this);
         this.door1.processPatron(patron);
     }
-        
-    // this.door1 = (this.door1 === null ? new Doorman(this) : this.door1);
-    // this.door1.processPatron(patron);
+
+};
+
+Bar.prototype.getInLine = function(patron)    {
+    this.patronsQueue.leave(patron);
+    this.serviceQueue.join(patron);
 };
 
 
@@ -247,6 +249,4 @@ myBar.visitor(p5);
 
 // Doing stuff in the bar
 myBar.getInLine(p1);
-myBar.serve();
-
-//---------------------------------------------------------------------------------------------------------
+myBar.tender.serve();
